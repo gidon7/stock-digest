@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>리서치 데스크 — 월가소식 아카이브</title>
+<style>
+  :root {
+    --bg: #f0f1ec;
+    --bg-card: #f8f9f4;
+    --ink: #1b1f1c;
+    --ink-soft: #56605a;
+    --ink-faint: #8a938c;
+    --rule: rgba(27, 31, 28, 0.12);
+    --rule-strong: rgba(27, 31, 28, 0.22);
+    --accent: #9c7a34;
+    --accent-strong: #7a5f27;
+    --accent-soft: rgba(156, 122, 52, 0.13);
+    --accent-ink: #6e5522;
+    --shadow: 0 1px 3px rgba(27, 31, 28, 0.07);
+
+    --cat-semi: #45647f;
+    --cat-semi-soft: rgba(69, 100, 127, 0.13);
+    --cat-infl: #9c4a3c;
+    --cat-infl-soft: rgba(156, 74, 60, 0.13);
+    --cat-cons: #4f7a56;
+    --cat-cons-soft: rgba(79, 122, 86, 0.13);
+    --cat-ai: #7a5a85;
+    --cat-ai-soft: rgba(122, 90, 133, 0.13);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #10130f;
+      --bg-card: #171b16;
+      --ink: #e8eae2;
+      --ink-soft: #9ba79c;
+      --ink-faint: #5e695f;
+      --rule: rgba(232, 234, 226, 0.1);
+      --rule-strong: rgba(232, 234, 226, 0.22);
+      --accent: #d9ae66;
+      --accent-strong: #e8c17f;
+      --accent-soft: rgba(217, 174, 102, 0.14);
+      --accent-ink: #e8c17f;
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+
+      --cat-semi: #7fa3c2;
+      --cat-semi-soft: rgba(127, 163, 194, 0.16);
+      --cat-infl: #d08872;
+      --cat-infl-soft: rgba(208, 136, 114, 0.16);
+      --cat-cons: #86b98c;
+      --cat-cons-soft: rgba(134, 185, 140, 0.16);
+      --cat-ai: #b48cc0;
+      --cat-ai-soft: rgba(180, 140, 192, 0.16);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #10130f; --bg-card: #171b16; --ink: #e8eae2; --ink-soft: #9ba79c; --ink-faint: #5e695f;
+    --rule: rgba(232, 234, 226, 0.1); --rule-strong: rgba(232, 234, 226, 0.22);
+    --accent: #d9ae66; --accent-strong: #e8c17f; --accent-soft: rgba(217, 174, 102, 0.14); --accent-ink: #e8c17f;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    --cat-semi: #7fa3c2; --cat-semi-soft: rgba(127, 163, 194, 0.16);
+    --cat-infl: #d08872; --cat-infl-soft: rgba(208, 136, 114, 0.16);
+    --cat-cons: #86b98c; --cat-cons-soft: rgba(134, 185, 140, 0.16);
+    --cat-ai: #b48cc0; --cat-ai-soft: rgba(180, 140, 192, 0.16);
+  }
+
+  :root[data-theme="light"] {
+    --bg: #f0f1ec; --bg-card: #f8f9f4; --ink: #1b1f1c; --ink-soft: #56605a; --ink-faint: #8a938c;
+    --rule: rgba(27, 31, 28, 0.12); --rule-strong: rgba(27, 31, 28, 0.22);
+    --accent: #9c7a34; --accent-strong: #7a5f27; --accent-soft: rgba(156, 122, 52, 0.13); --accent-ink: #6e5522;
+    --shadow: 0 1px 3px rgba(27, 31, 28, 0.07);
+    --cat-semi: #45647f; --cat-semi-soft: rgba(69, 100, 127, 0.13);
+    --cat-infl: #9c4a3c; --cat-infl-soft: rgba(156, 74, 60, 0.13);
+    --cat-cons: #4f7a56; --cat-cons-soft: rgba(79, 122, 86, 0.13);
+    --cat-ai: #7a5a85; --cat-ai-soft: rgba(122, 90, 133, 0.13);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; overflow-x: hidden; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Georgia, "Iowan Old Style", "Nanum Myeongjo", "Times New Roman", serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .kr { font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Pretendard", sans-serif; }
+  .num { font-family: "Cascadia Mono", "SF Mono", Consolas, "Nanum Gothic Coding", monospace; font-variant-numeric: tabular-nums; }
+
+  a { color: inherit; }
+
+  /* ---------- Nav ---------- */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg);
+    border-bottom: 1px solid var(--rule);
+    backdrop-filter: blur(6px);
+  }
+  .nav-inner {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: baseline; gap: 9px; }
+  .brand .mark {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .brand .sub {
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+
+  .tabs { display: flex; gap: 22px; }
+  .tab-btn {
+    position: relative;
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    font-size: 13.5px;
+    padding: 8px 1px 10px;
+    border: none;
+    background: transparent;
+    color: var(--ink-faint);
+    cursor: pointer;
+  }
+  .tab-btn .count { font-family: "Cascadia Mono", "SF Mono", Consolas, monospace; font-size: 11px; color: var(--ink-faint); margin-left: 5px; }
+  .tab-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .tab-btn.active { color: var(--ink); font-weight: 700; }
+  .tab-btn.active .count { color: var(--accent-ink); }
+  .tab-btn.active::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+    background: var(--accent); border-radius: 1px;
+  }
+
+  /* ---------- Toolbar ---------- */
+  .toolbar { display: flex; flex-direction: column; gap: 10px; margin: 20px 0 14px; }
+  .tb-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tb-search {
+    flex: 1; min-width: 150px; font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    font-size: 13px; padding: 8px 11px; border: 1px solid var(--rule-strong); border-radius: 6px;
+    background: var(--bg-card); color: var(--ink);
+  }
+  .tb-search::placeholder { color: var(--ink-faint); }
+  .tb-jump, .tb-sort {
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    font-size: 12.5px; padding: 8px 11px; border: 1px solid var(--rule-strong); border-radius: 6px;
+    background: var(--bg-card); color: var(--ink-soft); cursor: pointer;
+  }
+  .tb-sort:hover, .tb-jump:hover { border-color: var(--accent); color: var(--accent-ink); }
+  .tb-search:focus-visible, .tb-jump:focus-visible, .tb-sort:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .tb-filters { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    font-size: 11.5px; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--rule-strong);
+    background: var(--bg-card); color: var(--ink-soft); cursor: pointer;
+  }
+  .chip:hover { border-color: var(--accent); }
+  .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .chip.active { font-weight: 700; }
+
+  /* ---------- Layout ---------- */
+  .page { max-width: 880px; margin: 0 auto; padding: 0 24px 96px; }
+
+  .hero { padding: 30px 0 8px; }
+  .hero .eyebrow { font-size: 12px; letter-spacing: 0.14em; color: var(--ink-faint); text-transform: uppercase; }
+  .hero h1 {
+    font-size: clamp(24px, 4.6vw, 32px);
+    line-height: 1.3;
+    margin: 8px 0 6px;
+    font-weight: 400;
+    text-wrap: balance;
+  }
+  .hero p { font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; font-size: 13.5px; color: var(--ink-soft); max-width: 56ch; line-height: 1.65; margin: 0; }
+
+  .stamp {
+    margin: 18px 0 0;
+    border: 1px solid var(--rule-strong);
+    background: var(--bg-card);
+    padding: 11px 15px;
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    display: flex;
+    gap: 10px;
+    border-radius: 6px;
+  }
+  .stamp .mk { flex: none; font-family: Georgia, serif; font-style: italic; font-size: 10.5px; color: var(--accent-ink); border: 1px solid var(--accent); padding: 1px 6px; border-radius: 3px; white-space: nowrap; }
+
+  /* ---------- Dashboard stats ---------- */
+  .dash { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 22px 0; }
+  .stat-tile { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; box-shadow: var(--shadow); }
+  .stat-tile .label { font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; font-size: 11.5px; color: var(--ink-faint); }
+  .stat-tile .value { font-size: 26px; font-weight: 700; margin-top: 4px; }
+  .stat-tile .value .unit { font-size: 13px; color: var(--ink-faint); font-weight: 400; margin-left: 3px; }
+
+  .breakdown { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; margin-bottom: 26px; box-shadow: var(--shadow); }
+  .breakdown .label { font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; font-size: 11.5px; color: var(--ink-faint); margin-bottom: 10px; }
+  .bd-row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; font-size: 12.5px; }
+  .bd-row:last-child { margin-bottom: 0; }
+  .bd-swatch { width: 8px; height: 8px; border-radius: 2px; flex: none; }
+  .bd-name { width: 84px; flex: none; color: var(--ink-soft); }
+  .bd-bar-track { flex: 1; height: 6px; background: var(--rule); border-radius: 3px; overflow: hidden; }
+  .bd-bar-fill { height: 100%; border-radius: 3px; }
+  .bd-count { width: 20px; text-align: right; flex: none; color: var(--ink-faint); }
+
+  /* ---------- List (accordion) ---------- */
+  .list { list-style: none; margin: 0 0 8px; padding: 0; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: var(--bg-card); box-shadow: var(--shadow); }
+  .list-row { border-bottom: 1px solid var(--rule); }
+  .list-row:last-child { border-bottom: none; }
+  .row-head {
+    width: 100%; display: flex; align-items: center; gap: 12px;
+    padding: 13px 16px; background: none; border: none; cursor: pointer;
+    text-align: left; font-family: inherit; color: var(--ink);
+  }
+  .row-head:hover { background: var(--accent-soft); }
+  .row-head:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .row-date { flex: none; font-size: 15px; font-weight: 700; white-space: nowrap; }
+  .row-weekday {
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    font-size: 11px; color: var(--ink-faint); font-weight: 400; margin-left: 6px;
+  }
+  .row-dots { flex: none; display: flex; gap: 4px; }
+  .row-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .row-preview {
+    flex: 1; min-width: 0; font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    font-size: 12.5px; color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .row-count { flex: none; font-size: 12px; color: var(--ink-faint); white-space: nowrap; }
+  .chevron { flex: none; color: var(--ink-faint); font-size: 12px; transition: transform 0.15s ease; }
+  .row-head[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+  .row-body { padding: 2px 16px 16px; border-top: 1px solid var(--rule); background: var(--bg); }
+  .row-body.hidden { display: none; }
+
+  /* ---------- Date section ---------- */
+  .date-block { margin-top: 18px; }
+  .date-block:first-child { margin-top: 14px; }
+  .date-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+  .date-head .date { font-size: 15px; font-weight: 700; }
+  .date-head .weekday { font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; font-size: 11.5px; color: var(--ink-faint); }
+  .source-note { font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; font-size: 11.5px; color: var(--ink-faint); margin: 0 0 12px; }
+
+  /* ---------- Entry card ---------- */
+  .entry {
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--cat-color, var(--accent));
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .entry-head { display: flex; align-items: center; gap: 9px; margin-bottom: 9px; flex-wrap: wrap; }
+  .tag { font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; font-size: 10.5px; letter-spacing: 0.03em; color: var(--cat-color, var(--accent-ink)); background: var(--cat-color-soft, var(--accent-soft)); padding: 3px 8px; border-radius: 4px; white-space: nowrap; font-weight: 700; }
+  .entry-source { font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; font-size: 11.5px; color: var(--ink-faint); }
+  .entry h2 { font-size: 17px; line-height: 1.4; margin: 0 0 8px; font-weight: 700; text-wrap: balance; }
+  .entry p.lede { font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; font-size: 13.5px; line-height: 1.7; color: var(--ink-soft); margin: 0 0 12px; max-width: 64ch; }
+  .stats { display: flex; flex-direction: column; gap: 8px; }
+  .stat { font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; display: flex; gap: 9px; font-size: 12.5px; line-height: 1.65; max-width: 64ch; }
+  .stat::before { content: ""; flex: none; width: 4px; height: 4px; margin-top: 8px; border-radius: 50%; background: var(--cat-color, var(--accent)); }
+  .stat b { font-weight: 700; color: var(--ink); }
+  .stat .figure { font-weight: 700; color: var(--cat-color, var(--accent-ink)); }
+
+  .empty-note { font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; font-size: 13px; color: var(--ink-faint); padding: 20px 0; }
+
+  .footer { margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--rule); font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; font-size: 12px; color: var(--ink-faint); line-height: 1.7; }
+  .footer .next { color: var(--ink-soft); margin-bottom: 6px; }
+
+  @media (max-width: 620px) {
+    .dash { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .stat-tile { padding: 10px 10px; }
+    .stat-tile .value { font-size: 20px; }
+    .page { padding: 0 16px 72px; }
+    .bd-name { width: 68px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page kr">
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="brand">
+        <span class="mark num">RESEARCH DESK</span>
+        <span class="sub">리서치 데스크</span>
+      </div>
+      <div class="tabs" role="tablist">
+        <button class="tab-btn active" data-tab="daily" role="tab" aria-selected="true">일간<span class="count num"></span></button>
+        <button class="tab-btn" data-tab="weekly" role="tab" aria-selected="false">주간<span class="count num"></span></button>
+        <button class="tab-btn" data-tab="monthly" role="tab" aria-selected="false">월간<span class="count num"></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="eyebrow">Personal Research Archive</div>
+    <h1>받은 시황 리포트를 정리한 개인 아카이브</h1>
+    <p>사진으로 도착한 애널리스트 노트를 날짜별로 기록하고, 쌓이는 대로 주간·월간 흐름을 함께 볼 수 있게 정리합니다.</p>
+    <div class="stamp">
+      <span class="mk">NOTICE</span>
+      <span>각 리포트 발행처가 명시한 대로 이 요약은 일반 정보 제공 목적이며, 특정 종목의 매수·매도·보유를 권유하지 않습니다. 투자 판단과 책임은 본인에게 있습니다.</span>
+    </div>
+  </header>
+
+  <div id="dashboard"></div>
+  <div id="panel-daily"></div>
+  <div id="panel-weekly" style="display:none"></div>
+  <div id="panel-monthly" style="display:none"></div>
+
+  <footer class="footer">
+    <p class="next">다음 사진이 도착하면 이 아카이브에 새 날짜가 추가되고, 주간·월간 탭도 함께 갱신됩니다.</p>
+    <p>인용된 목표주가·전망치는 각 발행사(골드만삭스, CACIB, BofA, HSBC 등)의 자체 분석이며 실제 결과와 다를 수 있습니다.</p>
+  </footer>
+</div>
+
+<script>
+  const CAT_LABEL = { semi: "AI · 반도체", infl: "미국 · 물가", cons: "미국 · 소비", ai: "AI · 소비" };
+
+  const REPORTS = [
+    {
+      date: "2026-07-13",
+      source: "월가소식 · VaultyAI_분석팀 (발행 14:59, 원문 발간일 2026.07.12)",
+      topics: [
+        {
+          cat: "semi",
+          entrySource: "골드만삭스(GS)",
+          title: "GPU·HBM 다음 병목은 ABF 기판",
+          lede: "칩을 서버로 조립하려면 고성능 기판이 필요한데, AI 서버와 서버용 CPU 수요가 동시에 늘며 기판 부족과 가격 상승이 장기화될 수 있다는 분석입니다.",
+          stats: [
+            ["시장 전망 상향", "ABF 기판 시장 <span class=\"figure\">77억$(2025)</span> → <span class=\"figure\">330억$(2028)</span>, AI 서버향 수요 연평균 <span class=\"figure\">101%</span> 성장 전망"],
+            ["공급 부족 심화", "납기 3~4개월 → <span class=\"figure\">12개월+</span>로 장기화, 공급 부족률 2026년 하반기 <span class=\"figure\">14%</span> → 2028년 <span class=\"figure\">51%</span>"],
+            ["수혜주", "대만 기판 업체 집중 수혜, GS는 <b>NYPCB</b>를 최선호주로 제시 (킨서스·유니마이크론·ZDT 목표가도 81~112% 상향)"]
+          ]
+        },
+        {
+          cat: "infl",
+          entrySource: "골드만삭스 · CACIB",
+          title: "6월 CPI, 헤드라인은 식어도 근원은 끈적",
+          lede: "에너지 가격 하락이 헤드라인 물가를 둔화시키지만, 주거비가 관건인 근원 물가는 여전히 끈적한 흐름이 예상된다는 분석입니다.",
+          stats: [
+            ["헤드라인", "GS 전월비 <span class=\"figure\">-0.11%</span> 전망, CACIB는 전년비 <span class=\"figure\">4.25% → 3.81%</span>로 둔화 예상 (에너지·자동차 연료 하락 주도)"],
+            ["근원", "GS 전월비 <span class=\"figure\">0.17%</span>(전년비 2.76%) vs CACIB <span class=\"figure\">0.26%</span>(전년비 2.88%), 임대료·OER 둔화가 핵심"],
+            ["금리 시사점", "시장은 7월 인상 가능성을 낮게 반영(~7bp), 물가가 예상치를 크게 웃돌지 않으면 국채금리 완만한 하락 전망"]
+          ]
+        },
+        {
+          cat: "cons",
+          entrySource: "BofA",
+          title: "4년 만에 가장 뜨거운 카드 지출",
+          lede: "휘발유 가격 하락으로 생긴 여력이 재량 소비로 옮겨가고, 저소득층 소비·임금이 빠르게 따라붙으며 계층 간 소비 격차가 좁혀지는 흐름입니다.",
+          stats: [
+            ["카드 지출", "6월 가구당 지출 전년비 <span class=\"figure\">+6.3%</span>, 2022년 4월 이후 최고. 항공·여가 두 자릿수, 의류 약 <span class=\"figure\">7%</span>, 종합소매 약 <span class=\"figure\">5%</span> 증가"],
+            ["일시적 요인", "월드컵 개최·온라인 프로모션 일정 변경 영향 혼재, 개최 도시 음식점 지출이 다른 도시보다 2%p 더 증가"],
+            ["격차 완화", "저소득층 지출 증가율 <span class=\"figure\">4.1% → 4.8%</span>로 중간소득층과 근접, 세후 임금 증가율도 <span class=\"figure\">4.1%</span>로 2023년 7월 이후 최고"]
+          ]
+        },
+        {
+          cat: "ai",
+          entrySource: "HSBC",
+          title: "무료 AI가 만든 보이지 않는 구매력",
+          lede: "무료·저가 AI 도구가 기존 유료 서비스를 대체하면서, 소비자에게 새로운 소비 여력(소비자 잉여)이 생기고 있다는 분석입니다.",
+          stats: [
+            ["규모", "미국 내 AI 소비자 잉여 2024년 <span class=\"figure\">970억$</span> → 2026년 3월 <span class=\"figure\">1,720억$</span>, 2027년 약 <span class=\"figure\">2,500억$</span> 전망(GDP의 0.8%)"],
+            ["수혜 집중", "18~29세의 <span class=\"figure\">74%</span>가 주 여러 회 AI 사용(65세 이상은 46%), 열성 사용자의 체감 가치가 평균을 크게 끌어올림"],
+            ["파급 효과", "절약된 돈이 의류·외식·엔터로 이동할 여지, 반대로 광고 기반 서비스엔 부담 요인이 될 수 있음"]
+          ]
+        }
+      ]
+    }
+  ];
+
+  function koWeekday(dateStr) {
+    const d = new Date(dateStr + "T00:00:00");
+    return ["일", "월", "화", "수", "목", "금", "토"][d.getDay()] + "요일";
+  }
+  function fmtShortLocal(d) {
+    return String(d.getMonth() + 1).padStart(2, "0") + "." + String(d.getDate()).padStart(2, "0");
+  }
+  function todayLocalStr() {
+    const now = new Date();
+    return now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
+  }
+  function isoWeekInfo(dateStr) {
+    const d = new Date(dateStr + "T00:00:00");
+    const day = (d.getDay() + 6) % 7;
+    const monday = new Date(d); monday.setDate(d.getDate() - day);
+    const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
+    const thursday = new Date(monday); thursday.setDate(monday.getDate() + 3);
+    const yearStart = new Date(thursday.getFullYear(), 0, 1);
+    const weekNum = Math.ceil((((thursday - yearStart) / 86400000) + 1) / 7);
+    const key = thursday.getFullYear() + "-W" + String(weekNum).padStart(2, "0");
+    return { key, label: fmtShortLocal(monday) + " – " + fmtShortLocal(sunday) + " (" + thursday.getFullYear() + ")" };
+  }
+  function monthInfo(dateStr) {
+    const [y, m] = dateStr.split("-");
+    return { key: y + "-" + m, label: y + "년 " + parseInt(m, 10) + "월" };
+  }
+
+  function entryCard(topic) {
+    const cat = topic.cat;
+    return '<article class="entry" style="--cat-color: var(--cat-' + cat + '); --cat-color-soft: var(--cat-' + cat + '-soft);">' +
+      '<div class="entry-head"><span class="tag">' + CAT_LABEL[cat] + '</span><span class="entry-source">' + topic.entrySource + '</span></div>' +
+      '<h2>' + topic.title + '</h2>' +
+      '<p class="lede">' + topic.lede + '</p>' +
+      '<div class="stats">' + topic.stats.map(function(s) {
+        return '<div class="stat"><b>' + s[0] + '</b> — ' + s[1] + '</div>';
+      }).join("") +
+      '</div></article>';
+  }
+
+  function uniqueCats(topics) {
+    const seen = [];
+    topics.forEach(function(t) { if (seen.indexOf(t.cat) === -1) seen.push(t.cat); });
+    return seen;
+  }
+  function catDots(cats) {
+    return cats.map(function(c) {
+      return '<span class="row-dot" style="background:var(--cat-' + c + ')" title="' + CAT_LABEL[c] + '"></span>';
+    }).join("");
+  }
+  function topicsPreview(topics) {
+    return topics.map(function(t) { return t.title; }).join(" · ");
+  }
+  function matchesFilter(t, cat, query) {
+    if (cat && t.cat !== cat) return false;
+    if (!query) return true;
+    const hay = (t.title + " " + t.entrySource + " " + t.lede).toLowerCase();
+    return hay.indexOf(query) !== -1;
+  }
+  function renderRowBody(reports, cat, query, showDateHead) {
+    return reports.map(function(r) {
+      const matched = r.topics.filter(function(t) { return matchesFilter(t, cat, query); });
+      if (!matched.length) return "";
+      const head = showDateHead
+        ? '<div class="date-head"><span class="date num">' + r.date.replace(/-/g, ".") + '</span><span class="weekday">' + koWeekday(r.date) + '</span></div>'
+        : "";
+      return '<div class="date-block">' + head + '<p class="source-note">출처: ' + r.source + '</p>' + matched.map(entryCard).join("") + '</div>';
+    }).filter(Boolean).join("");
+  }
+
+  function renderDashboard() {
+    const allTopics = REPORTS.flatMap(function(r) { return r.topics.map(function(t) { return Object.assign({ date: r.date }, t); }); });
+    const todayStr = todayLocalStr();
+    const thisWeekKey = isoWeekInfo(todayStr).key;
+    const thisMonthKey = monthInfo(todayStr).key;
+    const weekCount = allTopics.filter(function(t) { return isoWeekInfo(t.date).key === thisWeekKey; }).length;
+    const monthCount = allTopics.filter(function(t) { return monthInfo(t.date).key === thisMonthKey; }).length;
+
+    const counts = {};
+    allTopics.forEach(function(t) { counts[t.cat] = (counts[t.cat] || 0) + 1; });
+    const maxCount = Math.max.apply(null, Object.values(counts).concat([1]));
+    const order = ["semi", "infl", "cons", "ai"];
+
+    const dash = document.getElementById("dashboard");
+    dash.innerHTML =
+      '<div class="dash">' +
+        '<div class="stat-tile"><div class="label">총 기록일</div><div class="value num">' + REPORTS.length + '<span class="unit">일</span></div></div>' +
+        '<div class="stat-tile"><div class="label">이번 주 리포트</div><div class="value num">' + weekCount + '<span class="unit">건</span></div></div>' +
+        '<div class="stat-tile"><div class="label">이번 달 리포트</div><div class="value num">' + monthCount + '<span class="unit">건</span></div></div>' +
+      '</div>' +
+      '<div class="breakdown"><div class="label">카테고리 누적 분포 (총 ' + allTopics.length + '건)</div>' +
+        order.filter(function(k){ return counts[k]; }).map(function(k) {
+          const c = counts[k] || 0;
+          return '<div class="bd-row">' +
+            '<span class="bd-swatch" style="background:var(--cat-' + k + ')"></span>' +
+            '<span class="bd-name">' + CAT_LABEL[k] + '</span>' +
+            '<span class="bd-bar-track"><span class="bd-bar-fill" style="width:' + (c / maxCount * 100) + '%; background:var(--cat-' + k + ')"></span></span>' +
+            '<span class="bd-count num">' + c + '</span>' +
+          '</div>';
+        }).join("") +
+      '</div>';
+  }
+
+  function computeRows(groupFn, prefix) {
+    if (!groupFn) {
+      return REPORTS.map(function(r) {
+        return { id: "day-" + r.date, sortKey: r.date, reports: [r], label: null };
+      });
+    }
+    const groups = {};
+    REPORTS.forEach(function(r) {
+      const info = groupFn(r.date);
+      if (!groups[info.key]) groups[info.key] = { label: info.label, reports: [] };
+      groups[info.key].reports.push(r);
+    });
+    return Object.keys(groups).map(function(k) {
+      return {
+        id: prefix + "-" + k,
+        sortKey: k,
+        reports: groups[k].reports.slice().sort(function(a, b) { return b.date.localeCompare(a.date); }),
+        label: groups[k].label
+      };
+    });
+  }
+
+  const tabState = {
+    daily: { cat: "", q: "", sort: "desc" },
+    weekly: { cat: "", q: "", sort: "desc" },
+    monthly: { cat: "", q: "", sort: "desc" }
+  };
+  const CAT_ORDER = ["semi", "infl", "cons", "ai"];
+
+  function chipHTML(key, label) {
+    return '<button type="button" class="chip" data-cat="' + key + '">' + label + '</button>';
+  }
+  function updateChipsUI(tabName, activeCat) {
+    document.querySelectorAll("#filters-" + tabName + " .chip").forEach(function(chip) {
+      const isActive = chip.dataset.cat === activeCat;
+      chip.classList.toggle("active", isActive);
+      const key = chip.dataset.cat;
+      if (isActive) {
+        const colorVar = key ? "var(--cat-" + key + ")" : "var(--accent)";
+        const softVar = key ? "var(--cat-" + key + "-soft)" : "var(--accent-soft)";
+        chip.style.color = colorVar; chip.style.borderColor = colorVar; chip.style.background = softVar;
+      } else {
+        chip.style.color = ""; chip.style.borderColor = ""; chip.style.background = "";
+      }
+    });
+  }
+
+  function renderList(tabName, rows) {
+    const state = tabState[tabName];
+    const query = state.q.trim().toLowerCase();
+    const cat = state.cat;
+
+    let visible = rows.map(function(row) {
+      const matchedTopics = [];
+      row.reports.forEach(function(r) {
+        r.topics.forEach(function(t) { if (matchesFilter(t, cat, query)) matchedTopics.push(t); });
+      });
+      return Object.assign({}, row, { matchedTopics: matchedTopics });
+    }).filter(function(row) { return row.matchedTopics.length > 0; });
+
+    visible.sort(function(a, b) {
+      return state.sort === "asc" ? a.sortKey.localeCompare(b.sortKey) : b.sortKey.localeCompare(a.sortKey);
+    });
+
+    const wrap = document.getElementById("listwrap-" + tabName);
+    if (!visible.length) {
+      wrap.innerHTML = '<p class="empty-note">조건에 맞는 리포트가 없습니다.</p>';
+      return;
+    }
+
+    const html = visible.map(function(row, idx) {
+      const expanded = idx === 0;
+      const headMain = row.label
+        ? '<span class="row-date">' + row.label + '</span>'
+        : '<span class="row-date num">' + row.reports[0].date.replace(/-/g, ".") + '<span class="row-weekday">' + koWeekday(row.reports[0].date) + '</span></span>';
+      const countLabel = row.label ? (row.reports.length + "일 · " + row.matchedTopics.length + "건") : (row.matchedTopics.length + "건");
+      const bodyHTML = renderRowBody(row.reports, cat, query, !!row.label);
+      return '<li class="list-row">' +
+        '<button class="row-head" aria-expanded="' + expanded + '" data-target="' + row.id + '">' +
+          headMain +
+          '<span class="row-dots">' + catDots(uniqueCats(row.matchedTopics)) + '</span>' +
+          '<span class="row-preview">' + topicsPreview(row.matchedTopics) + '</span>' +
+          '<span class="row-count num">' + countLabel + '</span>' +
+          '<span class="chevron">⌄</span>' +
+        '</button>' +
+        '<div class="row-body' + (expanded ? '' : ' hidden') + '" id="' + row.id + '">' + bodyHTML + '</div>' +
+      '</li>';
+    }).join("");
+
+    wrap.innerHTML = '<ul class="list">' + html + '</ul>';
+  }
+
+  function renderShell(tabName, rows, jumpPlaceholder) {
+    const panel = document.getElementById("panel-" + tabName);
+    const jumpOptions = rows.slice().sort(function(a, b) { return b.sortKey.localeCompare(a.sortKey); }).map(function(row) {
+      const label = row.label || (row.reports[0].date.replace(/-/g, ".") + " " + koWeekday(row.reports[0].date));
+      return '<option value="' + row.id + '">' + label + '</option>';
+    }).join("");
+
+    panel.innerHTML =
+      '<div class="toolbar">' +
+        '<div class="tb-row">' +
+          '<input type="search" class="tb-search" id="search-' + tabName + '" placeholder="종목명·키워드 검색" />' +
+          '<select class="tb-jump" id="jump-' + tabName + '"><option value="">' + jumpPlaceholder + '</option>' + jumpOptions + '</select>' +
+          '<button type="button" class="tb-sort" id="sort-' + tabName + '">최신순</button>' +
+        '</div>' +
+        '<div class="tb-filters" id="filters-' + tabName + '">' +
+          chipHTML("", "전체") + CAT_ORDER.map(function(k) { return chipHTML(k, CAT_LABEL[k]); }).join("") +
+        '</div>' +
+      '</div>' +
+      '<div id="listwrap-' + tabName + '"></div>';
+
+    document.getElementById("search-" + tabName).addEventListener("input", function(e) {
+      tabState[tabName].q = e.target.value;
+      renderList(tabName, rows);
+    });
+    document.getElementById("sort-" + tabName).addEventListener("click", function() {
+      const st = tabState[tabName];
+      st.sort = st.sort === "desc" ? "asc" : "desc";
+      this.textContent = st.sort === "desc" ? "최신순" : "오래된순";
+      renderList(tabName, rows);
+    });
+    document.getElementById("jump-" + tabName).addEventListener("change", function(e) {
+      const id = e.target.value;
+      if (!id) return;
+      tabState[tabName].cat = ""; tabState[tabName].q = "";
+      document.getElementById("search-" + tabName).value = "";
+      updateChipsUI(tabName, "");
+      renderList(tabName, rows);
+      requestAnimationFrame(function() {
+        const body = document.getElementById(id);
+        if (!body) return;
+        const btn = body.previousElementSibling;
+        if (btn && btn.classList.contains("row-head")) {
+          btn.setAttribute("aria-expanded", "true");
+          body.classList.remove("hidden");
+        }
+        body.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      e.target.value = "";
+    });
+    document.getElementById("filters-" + tabName).addEventListener("click", function(e) {
+      const chip = e.target.closest(".chip");
+      if (!chip) return;
+      tabState[tabName].cat = chip.dataset.cat;
+      updateChipsUI(tabName, chip.dataset.cat);
+      renderList(tabName, rows);
+    });
+
+    updateChipsUI(tabName, "");
+    renderList(tabName, rows);
+  }
+
+  renderDashboard();
+  const dailyRows = computeRows(null);
+  const weeklyRows = computeRows(isoWeekInfo, "week");
+  const monthlyRows = computeRows(monthInfo, "month");
+  renderShell("daily", dailyRows, "날짜 바로가기");
+  renderShell("weekly", weeklyRows, "주 바로가기");
+  renderShell("monthly", monthlyRows, "월 바로가기");
+
+  document.querySelector('.tab-btn[data-tab="daily"] .count').textContent = dailyRows.length;
+  document.querySelector('.tab-btn[data-tab="weekly"] .count').textContent = weeklyRows.length;
+  document.querySelector('.tab-btn[data-tab="monthly"] .count').textContent = monthlyRows.length;
+
+  document.addEventListener("click", function(e) {
+    const btn = e.target.closest(".row-head");
+    if (!btn) return;
+    const body = document.getElementById(btn.dataset.target);
+    const isOpen = btn.getAttribute("aria-expanded") === "true";
+    btn.setAttribute("aria-expanded", String(!isOpen));
+    body.classList.toggle("hidden", isOpen);
+  });
+
+  document.querySelectorAll(".tab-btn").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      document.querySelectorAll(".tab-btn").forEach(function(b) { b.classList.remove("active"); b.setAttribute("aria-selected", "false"); });
+      btn.classList.add("active"); btn.setAttribute("aria-selected", "true");
+      ["daily", "weekly", "monthly"].forEach(function(name) {
+        document.getElementById("panel-" + name).style.display = (name === btn.dataset.tab) ? "" : "none";
+      });
+    });
+  });
+</script>
+</body>
+</html>

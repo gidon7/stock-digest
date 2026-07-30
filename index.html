@@ -302,6 +302,31 @@
 
   .empty-note { font-size: 13px; color: var(--ink-faint); padding: 24px 4px; }
 
+  /* ---------- Overview tab ---------- */
+  .ov-section { margin: 0 0 32px; }
+  .ov-title { font-size: 16px; font-weight: 800; margin: 0 0 6px; }
+  .ov-sub { font-size: 12.5px; color: var(--ink-soft); line-height: 1.6; margin: 0 0 14px; max-width: 68ch; }
+  .ov-cards { display: flex; flex-direction: column; gap: 10px; }
+  .ov-cards .entry { margin-bottom: 0; }
+
+  .pt-table-wrap { overflow-x: auto; border-radius: 16px; box-shadow: var(--shadow); }
+  .pt-table { width: 100%; border-collapse: collapse; background: var(--bg-card); font-size: 12.5px; min-width: 620px; }
+  .pt-table th, .pt-table td { padding: 11px 14px; text-align: left; white-space: nowrap; border-bottom: 1px solid var(--rule); }
+  .pt-table th { font-size: 11px; color: var(--ink-faint); font-weight: 700; }
+  .pt-table tbody tr:last-child td { border-bottom: none; }
+  .pt-table td:first-child { font-weight: 700; }
+  .pt-table td.num { font-variant-numeric: tabular-nums; }
+  .pt-table .pt-note { white-space: normal; color: var(--ink-soft); font-size: 11.5px; display: inline-block; max-width: 32ch; }
+
+  .gloss-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .gloss-item { background: var(--bg-card); border-radius: 14px; padding: 14px 16px; box-shadow: var(--shadow); }
+  .gloss-term { font-size: 13px; font-weight: 800; margin-bottom: 4px; }
+  .gloss-desc { font-size: 12px; color: var(--ink-soft); line-height: 1.55; }
+
+  @media (max-width: 620px) {
+    .gloss-grid { grid-template-columns: 1fr; }
+  }
+
   .footer { margin-top: 36px; padding: 18px 4px 0; font-size: 12px; color: var(--ink-faint); line-height: 1.7; }
   .footer .next { color: var(--ink-soft); margin-bottom: 6px; font-weight: 600; }
 
@@ -331,7 +356,8 @@
       <span class="name">리서치 데스크</span>
     </div>
     <div class="tabs" role="tablist">
-      <button class="tab-btn active" data-tab="daily" role="tab" aria-selected="true"><span>일간</span><span class="count num"></span></button>
+      <button class="tab-btn active" data-tab="overview" role="tab" aria-selected="true"><span>종합</span><span class="count num"></span></button>
+      <button class="tab-btn" data-tab="daily" role="tab" aria-selected="false"><span>일간</span><span class="count num"></span></button>
       <button class="tab-btn" data-tab="weekly" role="tab" aria-selected="false"><span>주간</span><span class="count num"></span></button>
       <button class="tab-btn" data-tab="monthly" role="tab" aria-selected="false"><span>월간</span><span class="count num"></span></button>
     </div>
@@ -348,7 +374,8 @@
       </div>
     </header>
 
-    <div id="panel-daily"></div>
+    <div id="panel-overview"></div>
+    <div id="panel-daily" style="display:none"></div>
     <div id="panel-weekly" style="display:none"></div>
     <div id="panel-monthly" style="display:none"></div>
 
@@ -365,6 +392,48 @@
     markets: "증시 · 수급", fx: "환율", jp: "일본", kr: "한국",
     commodity: "원자재", policy: "정책 · 지정학", misc: "기타"
   };
+
+  const THEME_SUMMARY = {
+    semi: "6월 말~7월 초 반도체·AI 인프라가 사상 최고 랠리(SOX +87.8%, 코스피 +64.2%)를 기록한 뒤, 7월 중순부터 레버리지·포지션 청산발 조정(고점 대비 -20~28%)이 이어졌습니다. JP모건은 알파벳 클라우드 성장·하이퍼스케일러 가이던스를 근거로 강세론을 유지한 반면, 골드만삭스는 옵션 유동성 악화·레버리지 정점 통과를 이유로 신중론을 폈습니다. 최근 화두는 'AI가 진짜인가'보다 '언제 현금흐름으로 돌아오는가'와 오픈웨이트 저가 모델발 가격 경쟁으로 옮겨가고 있습니다.",
+    infl: "6월 CPI 둔화로 연준 인상 압력이 잦아드는 듯했지만, 중동발 에너지 충격이 재점화되며 7월 FOMC를 앞두고 인상 가능성이 다시 부각됐습니다. 대부분 기관은 동결을 기본 시나리오로 보면서도, 매파 소수의견과 25bp 인상 리스크를 함께 짚었습니다.",
+    cons: "미국 소비는 우려보다 견조했고 글로벌 PMI도 반등 조짐을 보였습니다. 저소득층 소비·임금이 빠르게 따라붙으며 K자 소비 격차는 완화되는 흐름이었고, 월드컵 소비 효과는 전국이 아닌 개최 도시·프리미엄 지출에 집중됐습니다.",
+    ai: "무료·저가 AI 도구가 소비자에게 새로운 구매력(소비자 잉여)을 만든다는 시각과, AI 인프라 건설 붐 자체가 오히려 물가와 중립금리를 끌어올리는 힘이라는 반대 시각이 함께 제기됐습니다.",
+    markets: "레버리지·CTA·헤지펀드 포지션 청산이 여러 날에 걸쳐 반복적으로 핵심 리스크로 지목됐습니다. 동시에 전 세계 투자자의 주식 비중은 사상 최고치에 달했고, 글로벌 자금은 미국과 기술주에 뚜렷하게 쏠렸습니다.",
+    fx: "엔화는 39년 만의 최저 수준까지 밀렸고, 일본 당국의 개입은 방향 전환이 아닌 속도 조절 성격으로 해석됐습니다. 달러는 매파적 금리 기대를 상당 부분 선반영해 되돌림 리스크가 함께 거론됐습니다.",
+    jp: "일본은행의 금리 인상 시점(10~12월)을 둘러싼 논쟁이 이어졌고, 도쿄 물가 반등과 370조 엔 규모 전략투자 계획이 함께 부각됐습니다. 엔저와 낮은 물가가 겹치며 '세계에서 가장 싼 선진국'이라는 평가도 나왔습니다.",
+    kr: "코스피는 AI 랠리의 진앙지(2분기 +64.2%)였다가 조정 국면에서도 가장 먼저, 가장 크게(-28~35%) 흔들린 시장이 됐습니다. 다수 리포트는 이를 펀더멘털 훼손보다 레버리지 ETF·개인 신용·옵션 되먹임 구조에 따른 수급 청산으로 진단했고, 회복에는 몇 주가 아닌 몇 달이 걸릴 수 있다고 봤습니다.",
+    commodity: "금은 연준 인상 기대와 금리 상승에 단기 눌렸지만 장기 강세 전망(연말~2027년 5,000달러대)은 유지됐습니다. 유가·천연가스는 호르무즈·유럽 에너지 이슈로 변동성이 반복됐습니다.",
+    policy: "미국 중간선거 판세가 접전으로 좁혀졌고, 바젤 은행자본 규제 완화, 브라질 관세를 둘러싼 정치적 파장, 골든돔 연계 우주·방산 조달 확대 등이 다뤄졌습니다.",
+    misc: "AI가 사이버 공격·방어 속도를 동시에 끌어올리며 보안 산업이 새 투자 테마로 부상했고, 신용시장에서는 하이일드 저등급(CCC) 스프레드가 확대되는 등 등급 간 차별화가 커졌습니다."
+  };
+
+  const PRICE_TARGETS = [
+    { ticker: "SpaceX", source: "골드만삭스(GS)", opinion: null, target: "205", currency: "$", current: null, note: null, date: "2026-07-08" },
+    { ticker: "SpaceX", source: "JP모건", opinion: null, target: "225", currency: "$", current: null, note: null, date: "2026-07-08" },
+    { ticker: "SpaceX", source: "모건스탠리", opinion: null, target: "300", currency: "$", current: null, note: null, date: "2026-07-08" },
+    { ticker: "메타(Meta)", source: "도이체방크", opinion: "매수", target: "810", currency: "$", current: null, note: null, date: "2026-07-10" },
+    { ticker: "NYPCB", source: "골드만삭스(GS)", opinion: "최선호주", target: null, currency: null, current: null, note: "목표주가 81~112% 상향 (킨서스·유니마이크론·ZDT 포함)", date: "2026-07-13" },
+    { ticker: "즈푸(Zhipu)", source: "JP모건", opinion: "비중확대", target: "1,600", currency: "HK$", current: null, note: "기존 목표가 HK$2,400에서 하향", date: "2026-07-22" },
+    { ticker: "미니맥스", source: "JP모건", opinion: "중립", target: "160", currency: "HK$", current: null, note: "기존 목표가 HK$240에서 하향", date: "2026-07-22" },
+    { ticker: "캐피털원", source: "모건스탠리", opinion: "최선호주", target: null, currency: null, current: null, note: "CET1 14.3%, 자사주 매입 여력 약 130억$ 근거", date: "2026-07-23" },
+    { ticker: "오라클", source: "도이체방크", opinion: "매수", target: "300", currency: "$", current: null, note: null, date: "2026-07-28" },
+    { ticker: "록히드마틴", source: "골드만삭스(GS)", opinion: "매도", target: null, currency: "$", current: null, note: "목표주가가 현재가를 하회 (구체 수치 비공개)", date: "2026-07-29" },
+    { ticker: "노스롭그루먼", source: "골드만삭스(GS)", opinion: "중립", target: null, currency: "$", current: null, note: "목표주가가 현재가를 하회 (구체 수치 비공개)", date: "2026-07-29" },
+    { ticker: "RTX", source: "골드만삭스(GS)", opinion: "중립", target: "206", currency: "$", current: "212.79", note: null, date: "2026-07-29" }
+  ];
+
+  const GLOSSARY = [
+    { term: "PER (주가수익비율)", desc: "주가를 주당순이익(EPS)으로 나눈 값. 이익 대비 주가가 비싼지 싼지를 가늠하는 가장 기본적인 지표예요." },
+    { term: "PBR / P·B (주가순자산비율)", desc: "주가를 주당순자산으로 나눈 값. 회사 장부상 자산 가치 대비 시장이 얼마를 쳐주는지 보여줘요." },
+    { term: "ROE (자기자본이익률)", desc: "자기자본으로 얼마나 효율적으로 이익을 냈는지 나타내는 지표. 높을수록 자본을 잘 굴렸다는 뜻이에요." },
+    { term: "EV/EBITDA", desc: "기업가치(시가총액+순차입금)를 세전영업이익(EBITDA)으로 나눈 값. 인수합병(M&A)에서 자주 쓰이는 밸류에이션 지표예요." },
+    { term: "목표주가 (Target Price)", desc: "애널리스트가 향후 통상 12개월 내 도달할 것으로 예상하는 주가. 현재가보다 반드시 정확한 예측은 아니고, 발행 시점의 분석 결과예요." },
+    { term: "괴리율 (Gap)", desc: "(목표주가 − 현재가) ÷ 현재가 × 100. 목표주가가 현재가보다 높으면 양수, 낮으면 음수로 표시돼요." },
+    { term: "투자의견 (매수/중립/매도)", desc: "애널리스트가 그 종목에 대해 갖는 방향성 판단. '중립'은 시장 평균 수익률과 비슷할 것이라는 뜻이지 '나쁘다'는 의미는 아니에요." },
+    { term: "FCF (잉여현금흐름)", desc: "영업활동으로 번 현금에서 설비투자(capex)를 뺀 금액. 배당·자사주매입·부채상환에 쓸 수 있는 실질적인 여유 현금이에요." },
+    { term: "bp (베이시스포인트)", desc: "1bp = 0.01%p. 금리나 스프레드처럼 아주 작은 변화를 다룰 때 쓰는 단위예요 (100bp = 1%p)." },
+    { term: "YoY / QoQ", desc: "YoY는 전년 동기 대비, QoQ는 전분기 대비 변화율. 계절성을 제거하고 추세를 보려면 YoY를, 최근 속도 변화를 보려면 QoQ를 함께 봐요." }
+  ];
 
   const REPORTS = [
     {
@@ -2393,7 +2462,71 @@
     renderList(tabName, rows);
   }
 
+  function renderOverview() {
+    const panel = document.getElementById("panel-overview");
+
+    const earliestDate = REPORTS.reduce(function(m, r) { return r.date < m ? r.date : m; }, REPORTS[0].date);
+    const latestDate = REPORTS.reduce(function(m, r) { return r.date > m ? r.date : m; }, REPORTS[0].date);
+    const rangeText = earliestDate.replace(/-/g, ".") + " ~ " + latestDate.replace(/-/g, ".");
+
+    const themeCards = CAT_ORDER.filter(function(k) { return THEME_SUMMARY[k]; }).map(function(k) {
+      return '<div class="entry" style="--cat-color: var(--cat-' + k + '); --cat-color-soft: var(--cat-' + k + '-soft);">' +
+        '<div class="entry-head"><span class="tag">' + CAT_LABEL[k] + '</span></div>' +
+        '<p class="lede" style="margin:0;">' + THEME_SUMMARY[k] + '</p>' +
+        '</div>';
+    }).join("");
+
+    const ptRows = PRICE_TARGETS.slice().sort(function(a, b) { return b.date.localeCompare(a.date); }).map(function(p) {
+      const targetText = p.target ? (p.currency || "") + p.target : "—";
+      const currentText = p.current ? (p.currency || "") + p.current : "—";
+      let gapText = "—";
+      if (p.target && p.current) {
+        const t = parseFloat(String(p.target).replace(/,/g, ""));
+        const c = parseFloat(String(p.current).replace(/,/g, ""));
+        if (!isNaN(t) && !isNaN(c) && c !== 0) {
+          const gap = (t - c) / c * 100;
+          gapText = (gap >= 0 ? "+" : "") + gap.toFixed(1) + "%";
+        }
+      }
+      return "<tr>" +
+        "<td>" + p.ticker + "</td>" +
+        "<td>" + p.source + "</td>" +
+        "<td>" + (p.opinion || "—") + "</td>" +
+        '<td class="num">' + targetText + "</td>" +
+        '<td class="num">' + currentText + "</td>" +
+        '<td class="num">' + gapText + "</td>" +
+        "<td>" + (p.note ? '<span class="pt-note">' + p.note + "</span>" : "—") + "</td>" +
+        "</tr>";
+    }).join("");
+
+    const glossaryCards = GLOSSARY.map(function(g) {
+      return '<div class="gloss-item"><div class="gloss-term">' + g.term + '</div><div class="gloss-desc">' + g.desc + "</div></div>";
+    }).join("");
+
+    panel.innerHTML =
+      '<section class="ov-section">' +
+      '<h2 class="ov-title">지금까지의 흐름 · 카테고리별 종합</h2>' +
+      '<p class="ov-sub">' + rangeText + ' 리포트에서 반복적으로 등장한 주제를 카테고리별로 묶었어요. 개별 리포트 요약이 아니라 여러 날짜에 걸친 흐름을 정리한 것이라, 특정 날짜의 세부 수치는 일간 탭에서 확인해주세요.</p>' +
+      '<div class="ov-cards">' + themeCards + "</div>" +
+      "</section>" +
+
+      '<section class="ov-section">' +
+      '<h2 class="ov-title">애널리스트 목표주가 비교</h2>' +
+      '<p class="ov-sub">리포트 원문에 목표주가·투자의견이 함께 언급된 종목만 모았어요. 괴리율은 원문에 실린 목표주가·현재가로 계산한 단순 수치이고, 매수·매도를 권하는 것이 아니라 각 발행사가 밝힌 내용을 그대로 정리한 거예요.</p>' +
+      '<div class="pt-table-wrap"><table class="pt-table"><thead><tr>' +
+      "<th>종목</th><th>발행사</th><th>의견</th><th>목표주가</th><th>현재가</th><th>괴리율</th><th>비고</th>" +
+      "</tr></thead><tbody>" + ptRows + "</tbody></table></div>" +
+      "</section>" +
+
+      '<section class="ov-section">' +
+      '<h2 class="ov-title">투자 용어 참고</h2>' +
+      '<p class="ov-sub">리포트에 자주 나오는 지표·용어를 간단히 정리했어요.</p>' +
+      '<div class="gloss-grid">' + glossaryCards + "</div>" +
+      "</section>";
+  }
+
   renderDashboard();
+  renderOverview();
   const dailyRows = computeRows(null);
   const weeklyRows = computeRows(isoWeekInfo, "week");
   const monthlyRows = computeRows(monthInfo, "month");
@@ -2401,6 +2534,7 @@
   renderShell("weekly", weeklyRows, "주 바로가기");
   renderShell("monthly", monthlyRows, "월 바로가기");
 
+  document.querySelector('.tab-btn[data-tab="overview"] .count').textContent = dailyRows.length;
   document.querySelector('.tab-btn[data-tab="daily"] .count').textContent = dailyRows.length;
   document.querySelector('.tab-btn[data-tab="weekly"] .count').textContent = weeklyRows.length;
   document.querySelector('.tab-btn[data-tab="monthly"] .count').textContent = monthlyRows.length;
@@ -2418,7 +2552,7 @@
     btn.addEventListener("click", function() {
       document.querySelectorAll(".tab-btn").forEach(function(b) { b.classList.remove("active"); b.setAttribute("aria-selected", "false"); });
       btn.classList.add("active"); btn.setAttribute("aria-selected", "true");
-      ["daily", "weekly", "monthly"].forEach(function(name) {
+      ["overview", "daily", "weekly", "monthly"].forEach(function(name) {
         document.getElementById("panel-" + name).style.display = (name === btn.dataset.tab) ? "" : "none";
       });
     });

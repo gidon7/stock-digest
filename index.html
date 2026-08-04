@@ -243,6 +243,21 @@
   .bd-bar-fill { height: 100%; border-radius: 3px; }
   .bd-count { width: 16px; text-align: right; flex: none; color: var(--ink-faint); font-weight: 600; }
 
+  .trend { background: var(--bg-card); border-radius: 12px; padding: 14px; box-shadow: var(--shadow); margin-bottom: 8px; }
+  .trend .label { font-size: 11px; color: var(--ink-faint); font-weight: 600; margin-bottom: 10px; }
+  .trend-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+  .trend-item {
+    display: flex; align-items: center; gap: 7px; font-size: 11.5px;
+    cursor: pointer; border-radius: 6px; padding: 3px 4px; margin: -3px -4px;
+  }
+  .trend-item:hover, .trend-item:focus-visible { background: var(--accent-soft); outline: none; }
+  .trend-rank { width: 13px; flex: none; color: var(--ink-faint); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .trend-name { width: 74px; flex: none; color: var(--ink); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .trend-bar-track { flex: 1; height: 6px; background: var(--rule); border-radius: 3px; overflow: hidden; }
+  .trend-bar-fill { height: 100%; border-radius: 3px; background: var(--accent); }
+  .trend-count { width: 16px; text-align: right; flex: none; color: var(--ink-faint); font-weight: 600; }
+  .trend-note { font-size: 10.5px; color: var(--ink-faint); margin: 10px 0 0; line-height: 1.5; }
+
   /* ---------- List (accordion) ---------- */
   .list { list-style: none; margin: 0 0 8px; padding: 0; border-radius: 16px; overflow: hidden; background: var(--bg-card); box-shadow: var(--shadow); }
   .list-row { border-bottom: 1px solid var(--rule); }
@@ -339,7 +354,7 @@
     .brand { margin-bottom: 14px; }
     .tabs { flex-direction: row; overflow-x: auto; gap: 6px; margin-bottom: 14px; }
     .tab-btn { width: auto; white-space: nowrap; }
-    .dash, .breakdown { display: none; }
+    .dash, .breakdown, .trend { display: none; }
     .main { min-width: 0; padding: 6px 16px 72px; }
     .row-preview { display: none; }
     .tb-row { flex-wrap: wrap; }
@@ -394,17 +409,17 @@
   };
 
   const THEME_SUMMARY = {
-    semi: "6월 말~7월 초 반도체·AI 인프라가 사상 최고 랠리(SOX +87.8%, 코스피 +64.2%)를 기록한 뒤, 7월 중순부터 레버리지·포지션 청산발 조정(고점 대비 -20~28%)이 이어졌습니다. JP모건은 알파벳 클라우드 성장·하이퍼스케일러 가이던스를 근거로 강세론을 유지한 반면, 골드만삭스는 옵션 유동성 악화·레버리지 정점 통과를 이유로 신중론을 폈습니다. 최근 화두는 'AI가 진짜인가'보다 '언제 현금흐름으로 돌아오는가'와 오픈웨이트 저가 모델발 가격 경쟁으로 옮겨가고 있습니다.",
-    infl: "6월 CPI 둔화로 연준 인상 압력이 잦아드는 듯했지만, 중동발 에너지 충격이 재점화되며 7월 FOMC를 앞두고 인상 가능성이 다시 부각됐습니다. 대부분 기관은 동결을 기본 시나리오로 보면서도, 매파 소수의견과 25bp 인상 리스크를 함께 짚었습니다.",
-    cons: "미국 소비는 우려보다 견조했고 글로벌 PMI도 반등 조짐을 보였습니다. 저소득층 소비·임금이 빠르게 따라붙으며 K자 소비 격차는 완화되는 흐름이었고, 월드컵 소비 효과는 전국이 아닌 개최 도시·프리미엄 지출에 집중됐습니다.",
+    semi: "6월 말~7월 초 반도체·AI 인프라가 사상 최고 랠리(SOX +87.8%, 코스피 +64.2%)를 기록한 뒤, 7월 중순부터 레버리지·포지션 청산발 조정(고점 대비 -20~28%)이 이어졌습니다. 8월 들어서는 조정의 성격을 두고 시각이 갈렸는데, 모건스탠리는 이를 펀더멘털 훼손이 아닌 수급 문제로 규정하며 매수 기회로 평가했고, 아마존 AWS·데이터센터 ROIC 분석 등 실제 실적으로 AI 투자 회수 여부를 검증하려는 움직임이 뚜렷해졌습니다. 화두는 'AI가 진짜인가'에서 '언제 현금흐름으로 돌아오는가'와 오픈웨이트 저가 모델발 가격 경쟁으로 옮겨가고 있습니다.",
+    infl: "6월 CPI 둔화로 연준 인상 압력이 잦아드는 듯했지만, 중동발 에너지 충격이 재점화되며 7월 FOMC를 앞두고 인상 가능성이 다시 부각됐습니다. 결국 동결로 마무리됐지만 매파 3인의 반대표가 남았고, 기관마다 비둘기파적·매파적으로 정반대 해석을 내놨습니다. TS 롬바드는 한발 더 나아가 15년 이어진 금리 사이클의 끝이 처음으로 보이기 시작했다고 진단했습니다.",
+    cons: "미국 소비는 우려보다 견조했고 글로벌 PMI도 반등 조짐을 보였습니다. 저소득층 소비·임금이 빠르게 따라붙으며 K자 소비 격차는 완화되는 흐름이었던 반면, 7월 들어 중국 제조업·서비스·건설 PMI가 일제히 위축되며 베이징이 '안정'이라는 표현을 성명에서 뺄 정도로 경기 취약성이 부각됐습니다.",
     ai: "무료·저가 AI 도구가 소비자에게 새로운 구매력(소비자 잉여)을 만든다는 시각과, AI 인프라 건설 붐 자체가 오히려 물가와 중립금리를 끌어올리는 힘이라는 반대 시각이 함께 제기됐습니다.",
     markets: "레버리지·CTA·헤지펀드 포지션 청산이 여러 날에 걸쳐 반복적으로 핵심 리스크로 지목됐습니다. 동시에 전 세계 투자자의 주식 비중은 사상 최고치에 달했고, 글로벌 자금은 미국과 기술주에 뚜렷하게 쏠렸습니다.",
-    fx: "엔화는 39년 만의 최저 수준까지 밀렸고, 일본 당국의 개입은 방향 전환이 아닌 속도 조절 성격으로 해석됐습니다. 달러는 매파적 금리 기대를 상당 부분 선반영해 되돌림 리스크가 함께 거론됐습니다.",
-    jp: "일본은행의 금리 인상 시점(10~12월)을 둘러싼 논쟁이 이어졌고, 도쿄 물가 반등과 370조 엔 규모 전략투자 계획이 함께 부각됐습니다. 엔저와 낮은 물가가 겹치며 '세계에서 가장 싼 선진국'이라는 평가도 나왔습니다.",
-    kr: "코스피는 AI 랠리의 진앙지(2분기 +64.2%)였다가 조정 국면에서도 가장 먼저, 가장 크게(-28~35%) 흔들린 시장이 됐습니다. 다수 리포트는 이를 펀더멘털 훼손보다 레버리지 ETF·개인 신용·옵션 되먹임 구조에 따른 수급 청산으로 진단했고, 회복에는 몇 주가 아닌 몇 달이 걸릴 수 있다고 봤습니다.",
+    fx: "엔화는 39년 만의 최저 수준까지 밀렸고, 7월 말에는 15년 만에 처음으로 미·일 공조 외환 개입이 이뤄졌습니다. 골드만삭스는 연준 FIMA 레포를 활용한 개입 구조를 미국이 자국 금리 상승을 우려하고 있다는 신호로 해석했습니다. 달러는 매파적 금리 기대를 상당 부분 선반영해 되돌림 리스크가 함께 거론됐습니다.",
+    jp: "일본은행의 금리 인상 시점(9월~내년 1월)을 둘러싼 논쟁이 이어졌고, 도쿄 물가 반등과 370조 엔 규모 전략투자 계획이 함께 부각됐습니다. 엔저와 낮은 물가가 겹치며 '세계에서 가장 싼 선진국'이라는 평가도 나왔지만, 8월 들어서는 국채 금리 상승과 정책 대응이 오히려 엔 강세로 되돌아갈 위험도 함께 제기됐습니다.",
+    kr: "코스피는 AI 랠리의 진앙지(2분기 +64.2%)였다가 조정 국면에서도 가장 먼저, 가장 크게(-28~40%) 흔들린 시장이 됐습니다. 다수 리포트는 이를 펀더멘털 훼손보다 레버리지 ETF·개인 신용·옵션 되먹임 구조에 따른 수급 청산(90% 안팎 진행)으로 진단했고, 이익 전망 자체는 오히려 상향되고 있다고 봤습니다. 8월 들어 산업생산이 예상의 두 배 넘게 반등하며 저점 통과 신호도 함께 나타났습니다.",
     commodity: "금은 연준 인상 기대와 금리 상승에 단기 눌렸지만 장기 강세 전망(연말~2027년 5,000달러대)은 유지됐습니다. 유가·천연가스는 호르무즈·유럽 에너지 이슈로 변동성이 반복됐습니다.",
     policy: "미국 중간선거 판세가 접전으로 좁혀졌고, 바젤 은행자본 규제 완화, 브라질 관세를 둘러싼 정치적 파장, 골든돔 연계 우주·방산 조달 확대 등이 다뤄졌습니다.",
-    misc: "AI가 사이버 공격·방어 속도를 동시에 끌어올리며 보안 산업이 새 투자 테마로 부상했고, 신용시장에서는 하이일드 저등급(CCC) 스프레드가 확대되는 등 등급 간 차별화가 커졌습니다."
+    misc: "AI가 사이버 공격·방어 속도를 동시에 끌어올리며 보안 산업이 새 투자 테마로 부상했고, 신용시장에서는 하이일드 저등급(CCC) 스프레드가 확대되는 등 등급 간 차별화가 커졌습니다. 한편 멕시코는 최대 수출 품목이 자동차에서 IT 하드웨어·AI 서버로 바뀌는 구조적 전환이 관세를 계기로 가속되고 있다는 분석도 나왔습니다."
   };
 
   const PRICE_TARGETS = [
@@ -419,7 +434,8 @@
     { ticker: "오라클", source: "도이체방크", opinion: "매수", target: "300", currency: "$", current: null, note: null, date: "2026-07-28" },
     { ticker: "록히드마틴", source: "골드만삭스(GS)", opinion: "매도", target: null, currency: "$", current: null, note: "목표주가가 현재가를 하회 (구체 수치 비공개)", date: "2026-07-29" },
     { ticker: "노스롭그루먼", source: "골드만삭스(GS)", opinion: "중립", target: null, currency: "$", current: null, note: "목표주가가 현재가를 하회 (구체 수치 비공개)", date: "2026-07-29" },
-    { ticker: "RTX", source: "골드만삭스(GS)", opinion: "중립", target: "206", currency: "$", current: "212.79", note: null, date: "2026-07-29" }
+    { ticker: "RTX", source: "골드만삭스(GS)", opinion: "중립", target: "206", currency: "$", current: "212.79", note: null, date: "2026-07-29" },
+    { ticker: "아마존(AWS)", source: "도이체방크", opinion: "매수", target: "325", currency: "$", current: null, note: "기존 목표가 $315에서 상향", date: "2026-08-03" }
   ];
 
   const GLOSSARY = [
@@ -2515,6 +2531,28 @@
     }).filter(Boolean).join("");
   }
 
+  function extractTickerMentions() {
+    const counts = {};
+    REPORTS.forEach(function(r) {
+      r.topics.forEach(function(t) {
+        t.stats.forEach(function(s) {
+          const matches = s[1].match(/<b>(.*?)<\/b>/g) || [];
+          matches.forEach(function(m) {
+            const inner = m.replace(/<\/?b>/g, "");
+            inner.split(/[·,]/).forEach(function(name) {
+              const clean = name.trim();
+              if (!clean) return;
+              counts[clean] = (counts[clean] || 0) + 1;
+            });
+          });
+        });
+      });
+    });
+    return Object.keys(counts)
+      .map(function(name) { return { name: name, count: counts[name] }; })
+      .sort(function(a, b) { return b.count - a.count || a.name.localeCompare(b.name); });
+  }
+
   function renderDashboard() {
     const allTopics = REPORTS.flatMap(function(r) { return r.topics.map(function(t) { return Object.assign({ date: r.date }, t); }); });
     const todayStr = todayLocalStr();
@@ -2528,6 +2566,9 @@
     const maxCount = Math.max.apply(null, Object.values(counts).concat([1]));
     const order = ["semi", "infl", "cons", "ai", "markets", "commodity", "fx", "jp", "kr", "policy", "misc"];
 
+    const mentions = extractTickerMentions().slice(0, 8);
+    const maxMention = Math.max.apply(null, mentions.map(function(m) { return m.count; }).concat([1]));
+
     const dash = document.getElementById("dashboard");
     dash.innerHTML =
       '<div class="dash">' +
@@ -2535,6 +2576,21 @@
         '<div class="stat-tile"><div class="label">이번 주</div><div class="value num">' + weekCount + '<span class="unit">건</span></div></div>' +
         '<div class="stat-tile"><div class="label">이번 달</div><div class="value num">' + monthCount + '<span class="unit">건</span></div></div>' +
       '</div>' +
+      (mentions.length ?
+      '<div class="trend" id="trend-widget">' +
+        '<div class="label">많이 언급된 종목 · 리포트 내 강조 횟수</div>' +
+        '<ul class="trend-list">' +
+        mentions.map(function(m, idx) {
+          return '<li class="trend-item" data-ticker="' + m.name.replace(/"/g, "&quot;") + '" tabindex="0" role="button">' +
+            '<span class="trend-rank">' + (idx + 1) + '</span>' +
+            '<span class="trend-name">' + m.name + '</span>' +
+            '<span class="trend-bar-track"><span class="trend-bar-fill" style="width:' + (m.count / maxMention * 100) + '%"></span></span>' +
+            '<span class="trend-count num">' + m.count + '</span>' +
+          '</li>';
+        }).join("") +
+        '</ul>' +
+        '<p class="trend-note">종목을 누르면 일간 탭에서 관련 리포트를 검색해요.</p>' +
+      '</div>' : "") +
       '<div class="breakdown"><div class="label">카테고리 누적 분포 · 총 ' + allTopics.length + '건</div>' +
         order.filter(function(k){ return counts[k]; }).map(function(k) {
           const c = counts[k] || 0;
@@ -2784,6 +2840,31 @@
     const isOpen = btn.getAttribute("aria-expanded") === "true";
     btn.setAttribute("aria-expanded", String(!isOpen));
     body.classList.toggle("hidden", isOpen);
+  });
+
+  function jumpToTickerSearch(name) {
+    const dailyTab = document.querySelector('.tab-btn[data-tab="daily"]');
+    if (dailyTab) dailyTab.click();
+    const input = document.getElementById("search-daily");
+    if (!input) return;
+    input.value = name;
+    input.dispatchEvent(new Event("input"));
+    requestAnimationFrame(function() {
+      input.scrollIntoView({ behavior: "smooth", block: "center" });
+      input.focus();
+    });
+  }
+  document.addEventListener("click", function(e) {
+    const item = e.target.closest(".trend-item");
+    if (!item) return;
+    jumpToTickerSearch(item.dataset.ticker);
+  });
+  document.addEventListener("keydown", function(e) {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const item = e.target.closest(".trend-item");
+    if (!item) return;
+    e.preventDefault();
+    jumpToTickerSearch(item.dataset.ticker);
   });
 
   document.querySelectorAll(".tab-btn").forEach(function(btn) {

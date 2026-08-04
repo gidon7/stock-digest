@@ -2517,7 +2517,8 @@
   function matchesFilter(t, cat, query) {
     if (cat && t.cat !== cat) return false;
     if (!query) return true;
-    const hay = (t.title + " " + t.entrySource + " " + t.lede).toLowerCase();
+    const statsText = t.stats.map(function(s) { return s[0] + " " + s[1]; }).join(" ");
+    const hay = (t.title + " " + t.entrySource + " " + t.lede + " " + statsText).toLowerCase();
     return hay.indexOf(query) !== -1;
   }
   function renderRowBody(reports, cat, query, showDateHead) {

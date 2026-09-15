@@ -456,6 +456,41 @@
     .ds-card { padding: 18px; border-radius: var(--r-md); }
   }
 
+  /* ---------- 시각 변경 추적 ---------- */
+  .rv-grid { display: flex; flex-direction: column; gap: 10px; }
+  .rv-card { background: var(--bg-card); border-radius: var(--r-lg); padding: 20px 22px; }
+  .rv-head { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .rv-subject { font-size: 16px; font-weight: 700; letter-spacing: -0.035em; }
+  .rv-house { font-size: 12.5px; font-weight: 600; color: var(--ink-faint); }
+  .rv-kind {
+    font-size: 11.5px; font-weight: 600; color: var(--ink-faint);
+    background: var(--bg-sunken); padding: 4px 9px; border-radius: 7px;
+  }
+  .rv-dir {
+    margin-left: auto; font-size: 11.5px; font-weight: 700;
+    padding: 4px 10px; border-radius: 999px; white-space: nowrap;
+  }
+  .rv-up .rv-dir { color: var(--up); background: var(--up-soft); }
+  .rv-down .rv-dir { color: var(--down); background: var(--down-soft); }
+  .rv-mixed .rv-dir { color: var(--ink-faint); background: var(--bg-sunken); }
+
+  .rv-chain { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .rv-step { display: flex; flex-direction: column; gap: 3px; }
+  .rv-val { font-size: 15px; font-weight: 600; color: var(--ink-faint); letter-spacing: -0.03em; }
+  .rv-when { font-size: 11.5px; color: var(--ink-dim); font-weight: 600; }
+  .rv-now .rv-val { font-size: 22px; font-weight: 700; }
+  .rv-up .rv-now .rv-val { color: var(--up); }
+  .rv-down .rv-now .rv-val { color: var(--down); }
+  .rv-mixed .rv-now .rv-val { color: var(--ink); }
+  .rv-arrow { font-size: 14px; color: var(--ink-dim); padding-bottom: 20px; }
+  .rv-why { font-size: 13.5px; line-height: 1.68; color: var(--ink-soft); margin: 0; font-weight: 500; max-width: 74ch; }
+
+  @media (max-width: 720px) {
+    .rv-card { padding: 18px; border-radius: var(--r-md); }
+    .rv-dir { margin-left: 0; }
+    .rv-now .rv-val { font-size: 20px; }
+  }
+
   .gloss-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .gloss-item { background: var(--bg-card); border-radius: var(--r-md); padding: 18px 20px; }
   .gloss-term { font-size: 15px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.03em; }
@@ -726,6 +761,66 @@
       a: { who: "UBS", claim: "이란·오만 협상 진전이 유가를 7% 넘게 끌어내렸다" },
       b: { who: "노무라", claim: "협상 교착으로 유가가 높게 유지될 것" },
       split: "같은 협상을 두고 전제가 정면으로 갈렸고, 유가가 펀더멘털보다 뉴스 한 줄에 좌우되는 국면"
+    }
+  ];
+
+  /* 한 발행사가 같은 대상에 대한 숫자나 시각을 바꾼 이력.
+     원문에 변경 전후가 모두 명시된 건만 수록한다. dir: up(상향·매파) / down(하향·비둘기) / mixed */
+  const REVISIONS = [
+    {
+      subject: "즈푸(Zhipu)", house: "JP모건", kind: "목표주가", dir: "mixed",
+      path: [{ v: "HK$2,400", d: null }, { v: "HK$1,600", d: "2026-07-22" }, { v: "HK$1,800", d: "2026-08-19" }],
+      why: "7월 22일 비중확대 의견은 유지한 채 목표가를 HK$2,400에서 1,600으로 낮췄다가, 8월 19일 GLM-5.3 공개 이후 1,800으로 일부 되돌렸다. 사전학습 없이 사후학습만으로 성능이 올랐다는 점을 경쟁력이 회사 내부에서 만들어진 근거로 봤다. 같은 모델을 두고 골드만삭스는 2026년 ARR 30배로 이미 비싸다며 중립을 유지했다."
+    },
+    {
+      subject: "유비테크", house: "JP모건", kind: "목표주가", dir: "down",
+      path: [{ v: "HK$161", d: null }, { v: "HK$118", d: "2026-08-20" }],
+      why: "8월 19일 유니트리가 상하이 커촹반에 상장하며 시초가가 공모가 대비 600% 넘게 뛰자, 순수 사업자에 대한 가격 발견이 시작되면서 오히려 섹터 밸류에이션의 상한선으로 작용할 것으로 봤다. 실적 전망은 그대로 두고 적용 배수만 내린 조정이다."
+    },
+    {
+      subject: "미니맥스", house: "JP모건", kind: "목표주가", dir: "down",
+      path: [{ v: "HK$240", d: null }, { v: "HK$160", d: "2026-07-22" }],
+      why: "중립 의견을 유지하면서 목표가를 33% 낮췄다. 같은 날 즈푸도 함께 하향돼, 중국 AI 모델 기업 전반의 배수를 조정한 성격이다."
+    },
+    {
+      subject: "아마존", house: "도이체방크", kind: "목표주가", dir: "up",
+      path: [{ v: "$315", d: null }, { v: "$325", d: "2026-08-03" }],
+      why: "2분기 AWS 매출이 422억 달러로 전년 대비 37% 성장해 컨센서스 31%를 웃돌았고, 수주잔고가 3,640억에서 4,960억 달러로 급증했다. 설비투자를 2,000억에서 2,200억 달러로 올렸음에도 AWS 수익성이 이를 상쇄한다고 판단해 매수를 유지했다."
+    },
+    {
+      subject: "2030년 데이터센터 전력 수요 증가율", house: "골드만삭스", kind: "전망치", dir: "up",
+      path: [{ v: "117%", d: null }, { v: "170%", d: "2026-09-01" }],
+      why: "증가분의 60% 이상이 미국에서 발생하며, 8개 하이퍼스케일러의 자본지출과 R&D 합계가 2026년 1조 2,000억 달러에 이른다. 다만 같은 회사는 8월 14일 전력 집약도 하락이 부담을 상쇄한다고 봤고, 모건스탠리는 미국에서만 38GW 순부족을 제시해 병목 판단은 계속 갈린다."
+    },
+    {
+      subject: "일본은행 다음 인상 시점", house: "바클레이즈", kind: "전망", dir: "up",
+      path: [{ v: "10월", d: null }, { v: "9월", d: "2026-08-19" }],
+      why: "총재 기자회견보다 훨씬 매파적이었던 8월 10일 '주요 의견'을 근거로 앞당겼다. 정해진 스케줄이 아니라 필요하면 언제든 움직이겠다는 신호로 읽었고, 최종금리 전망도 1.5%에서 1.75%로 함께 올렸다."
+    },
+    {
+      subject: "일본은행 다음 인상 시점", house: "JP모건", kind: "전망", dir: "up",
+      path: [{ v: "10월", d: null }, { v: "9월", d: "2026-08-20" }],
+      why: "바클레이즈보다 하루 뒤 같은 방향으로 수정했다. 근거는 시장 변동성 위험이며, 2026년 말 정책금리 전망 1.5%와 2027년 말 2.25%를 함께 제시했다. 다만 9월 7일 기준 스와프 시장이 반영한 종착점 2.5%와 미즈호 전망 1.75% 사이에는 여전히 75bp 격차가 남아 있다."
+    },
+    {
+      subject: "한국 GDP 성장률(2026)", house: "ING", kind: "전망치", dir: "up",
+      path: [{ v: "3%", d: null }, { v: "4%", d: "2026-06-23" }],
+      why: "글로벌 AI 붐과 반도체 슈퍼사이클이 수출을 넘어 소비·투자·정부지출까지 자극한다고 판단했다. 이후 8월 3일 6월 산업생산이 전월 대비 +6.4%로 컨센서스 +2.9%를 크게 웃돌며 이 방향을 뒷받침했다."
+    },
+    {
+      subject: "멕시코 성장률(2027)", house: "모건스탠리", kind: "전망치", dir: "up",
+      path: [{ v: "1.7%", d: null }, { v: "1.9%", d: "2026-07-31" }],
+      why: "IT 하드웨어·AI 수출이 약 50% 성장하며 전체 수출의 30%까지 커졌고 서버 수출은 70% 급증했다. USMCA 준수율과 실효관세의 비대칭이 자동차에서 IT로의 전환을 구조적으로 가속시킨다고 봤다."
+    },
+    {
+      subject: "코스피 버블 위험 등급", house: "BofA", kind: "시각 전환", dir: "down",
+      path: [{ v: "0.8 이상 (경보)", d: "2025-10" }, { v: "0.52 (해제)", d: "2026-09-07" }],
+      why: "약 11개월 만에 버블 위험 딱지를 떼어냈다. 여름을 거치며 레버리지가 높은 자금이 정리되면서 코스피200 3개월 내재변동성이 7월 초 80% 부근에서 44.5%까지 내려온 것이 근거다. 결론은 안전해졌다가 아니라 상승에 베팅할 수 있다는 쪽으로, 12개월 선행 PER 6.2배는 자체 10년 이력에서 백분위 1이다."
+    },
+    {
+      subject: "중국 인터넷 섹터", house: "UBS", kind: "시각 전환", dir: "up",
+      path: [{ v: "비관", d: null }, { v: "선별 긍정", d: "2026-08-14" }],
+      why: "규제 압력으로 음식 배달 손실이 2025년 3분기 정점 이후 줄고, 알리바바 클라우드 성장률이 45%로 가속되며 마진까지 개선됐고, 반도체 쏠림이 풀리며 자금이 돌아오고 있다는 세 가지를 근거로 들었다. 다만 텐센트를 두고는 2026년 EPS 하향 위험을 경고해, 46% 상승 여력을 제시한 모건스탠리와 갈렸다."
     }
   ];
 
@@ -3741,6 +3836,28 @@
 
     const sameHouse = DISSENT.filter(function(d) { return d.axis.indexOf("같은 하우스") === 0; }).length;
 
+    const DIR_LABEL = { up: "상향", down: "하향", mixed: "하향 후 되돌림" };
+    const revisionCards = REVISIONS.map(function(r) {
+      const chain = r.path.map(function(p, i) {
+        const isLast = i === r.path.length - 1;
+        return (i > 0 ? '<span class="rv-arrow">→</span>' : "") +
+          '<span class="rv-step' + (isLast ? " rv-now" : "") + '">' +
+            '<span class="rv-val num">' + p.v + "</span>" +
+            '<span class="rv-when">' + (p.d ? p.d.replace(/-/g, ".") : "기존") + "</span>" +
+          "</span>";
+      }).join("");
+      return '<div class="rv-card rv-' + r.dir + '">' +
+        '<div class="rv-head">' +
+          '<span class="rv-subject">' + r.subject + "</span>" +
+          '<span class="rv-house">' + r.house + "</span>" +
+          '<span class="rv-kind">' + r.kind + "</span>" +
+          '<span class="rv-dir">' + DIR_LABEL[r.dir] + "</span>" +
+        "</div>" +
+        '<div class="rv-chain">' + chain + "</div>" +
+        '<p class="rv-why">' + r.why + "</p>" +
+        "</div>";
+    }).join("");
+
     const glossaryCards = GLOSSARY.map(function(g) {
       return '<div class="gloss-item"><div class="gloss-term">' + g.term + '</div><div class="gloss-desc">' + g.desc + "</div></div>";
     }).join("");
@@ -3756,6 +3873,12 @@
       '<h2 class="ov-title">같은 사안, 갈린 결론</h2>' +
       '<p class="ov-sub">동일한 지표나 사건을 두고 기관의 결론이 정면으로 엇갈린 사례입니다. 원문에 양측 주장이 함께 실린 <b>' + DISSENT.length + '건</b>만 수록했고, 이 가운데 <b>' + sameHouse + '건</b>은 같은 하우스의 다른 데스크끼리 갈린 경우입니다. 어느 쪽이 옳은지는 판단하지 않으며, 무엇이 판단을 갈랐는지만 표시합니다.</p>' +
       '<div class="ds-grid">' + dissentCards + "</div>" +
+      "</section>" +
+
+      '<section class="ov-section">' +
+      '<h2 class="ov-title">시각이 바뀐 지점</h2>' +
+      '<p class="ov-sub">한 발행사가 같은 대상에 대해 숫자나 시각을 바꾼 이력입니다. 원문에 변경 전후가 모두 명시된 <b>' + REVISIONS.length + '건</b>만 수록했습니다. 어느 방향이 맞았는지가 아니라, 무엇을 보고 바꿨는지가 기록의 목적입니다.</p>' +
+      '<div class="rv-grid">' + revisionCards + "</div>" +
       "</section>" +
 
       '<section class="ov-section">' +
